@@ -9,12 +9,6 @@ dotenv.config();
 
 export const notion = new Client({ auth: process.env.NOTION_KEY });
 
-export type PageObjectResponseWithProperties = PageObjectResponse & {
-  properties: {
-    Description: RichTextPropertyItemObjectResponse;
-  };
-};
-
 export const getDatabase = async (
   databaseId: string
 ): Promise<GetDatabaseResponse | undefined> => {
@@ -35,7 +29,7 @@ const getPages = async (databaseId: string) => {
   const response = await notion.databases.query({
     database_id: databaseId as string,
   });
-  return response.results as PageObjectResponseWithProperties[];
+  return response.results
 };
 
 const run = async () => {
@@ -46,7 +40,6 @@ const run = async () => {
     }
 
     if (page.properties.Description.type === "rich_text") {
-      // @ts-ignore
       return page.properties.Description.rich_text[0]?.plain_text;
     }
   });
@@ -60,7 +53,7 @@ const run = async () => {
     }
 
     if (page.properties.Description.type === "rich_text") {
-      return page.properties.Description.rich_text?.plain_text;
+      return page.properties.Description.rich_text[0]?.plain_text;
     }
   });
   console.log(
